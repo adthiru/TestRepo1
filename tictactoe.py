@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
+# ANSI color codes
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+RESET = '\033[0m'
+
 def print_board(b):
     for i in range(0, 9, 3):
-        print(f" {b[i]} | {b[i+1]} | {b[i+2]} ")
+        print(f"{BLUE} {b[i]} {RESET}|{GREEN} {b[i+1]} {RESET}|{YELLOW} {b[i+2]} {RESET}")
         if i < 6:
             print("-----------")
 
