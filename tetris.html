@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tetris</title>
+    <style>
+        canvas { border: 2px solid #333; display: block; margin: 20px auto; }
+        body { background: #111; text-align: center; color: #fff; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Tetris</h1>
+    <canvas id="board" width="200" height="400"></canvas>
+    <p>Arrow keys to move, Up to rotate</p>
+    <script>
+        const canvas = document.getElementById('board');
+        const ctx = canvas.getContext('2d');
+        const COLS = 10, ROWS = 20, SZ = 20;
+        const COLORS = ['#0ff','#00f','#f90','#ff0','#0f0','#90f','#f00'];
+
+        const PIECES = [
+            [[1,1,1,1]],
+            [[1,0,0],[1,1,1]],
+            [[0,0,1],[1,1,1]],
+            [[1,1],[1,1]],
+            [[0,1,1],[1,1,0]],
+            [[0,1,0],[1,1,1]],
+            [[1,1,0],[0,1,1]]
+        ];
+
+        let board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+        let piece, px, py, color;
+
+        function spawn() {
+            const i = Math.floor(Math.random() * PIECES.length);
+            piece = PIECES[i];
+            color = COLORS[i];
+            px = Math.floor((COLS - piece[0].length) / 2);
+            py = 0;
+        }
+
+        function valid(p, x, y) {
+            return p.every((row, dy) => row.every((v, dx) =>
+                !v || (x+dx >= 0 && x+dx < COLS && y+dy < ROWS && !board[y+dy]?.[x+dx])
+            ));
+        }
+
+        function merge() {
+            piece.forEach((row, dy) => row.forEach((v, dx) => {
+                if (v) board[py+dy][px+dx] = color;
+            }));
+        }
+
+        function clear() {
+            board = board.filter(row => row.some(c => !c));
+            while (board.length < ROWS) board.unshift(Array(COLS).fill(0));
+        }
+
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            board.forEach((row, y) => row.forEach((c, x) => {
+                if (c) { ctx.fillStyle = c; ctx.fillRect(x*SZ, y*SZ, SZ-1, SZ-1); }
+            }));
+            piece.forEach((row, dy) => row.forEach((v, dx) => {
+                if (v) { ctx.fillStyle = color; ctx.fillRect((px+dx)*SZ, (py+dy)*SZ, SZ-1, SZ-1); }
+            }));
+        }
+
+        function drop() {
+            if (valid(piece, px, py+1)) { py++; }
+            else { merge(); clear(); spawn(); if (!valid(piece, px, py)) { board = Array.from({length: ROWS}, () => Array(COLS).fill(0)); } }
+            draw();
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft' && valid(piece, px-1, py)) px--;
+            if (e.key === 'ArrowRight' && valid(piece, px+1, py)) px++;
+            if (e.key === 'ArrowDown') drop();
+            if (e.key === 'ArrowUp') {
+                const rotated = piece[0].map((_, i) => piece.map(r => r[i]).reverse());
+                if (valid(rotated, px, py)) piece = rotated;
+            }
+            draw();
+        });
+
+        spawn();
+        draw();
+        setInterval(drop, 500);
+    </script>
+</body>
+</html>
