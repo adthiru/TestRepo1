@@ -9,7 +9,7 @@
 </head>
 <body>
     <h1>Tetris</h1>
-    <canvas id="board" width="200" height="400"></canvas>
+    <canvas id="board" width="200" height="400" tabindex="0"></canvas>
     <p>Arrow keys to move, Up to rotate</p>
     <script>
         const canvas = document.getElementById('board');
@@ -72,7 +72,8 @@
             draw();
         }
 
-        document.addEventListener('keydown', e => {
+        canvas.addEventListener('keydown', e => {
+            e.preventDefault();
             if (e.key === 'ArrowLeft' && valid(piece, px-1, py)) px--;
             if (e.key === 'ArrowRight' && valid(piece, px+1, py)) px++;
             if (e.key === 'ArrowDown') drop();
@@ -84,6 +85,7 @@
         });
 
         spawn();
+        canvas.focus();
         draw();
         setInterval(drop, 500);
     </script>
