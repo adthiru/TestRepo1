@@ -13,7 +13,15 @@
     <p>Arrow keys to move, Up to rotate</p>
     <script>
         const canvas = document.getElementById('board');
+        if (!canvas) {
+            console.error('Canvas element not found');
+            throw new Error('Canvas element not found');
+        }
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Could not get 2D context');
+            throw new Error('Could not get 2D context');
+        }
         const COLS = 10, ROWS = 20, SZ = 20;
         const COLORS = ['#0ff','#00f','#f90','#ff0','#0f0','#90f','#f00'];
 
@@ -85,7 +93,11 @@
 
         spawn();
         draw();
-        setInterval(drop, 500);
+        const timerId = setInterval(drop, 500);
+
+        window.addEventListener('beforeunload', () => {
+            clearInterval(timerId);
+        });
     </script>
 </body>
 </html>
