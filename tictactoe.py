@@ -13,24 +13,34 @@ def check_win(b, p):
 def play():
     board = [str(i) for i in range(9)]
     player = 'X'
-    
-    for turn in range(9):
+    moves_made = 0
+
+    while moves_made < 9:
         print_board(board)
-        move = int(input(f"Player {player}, enter position (0-8): "))
-        
+
+        while True:
+            try:
+                move = int(input(f"Player {player}, enter position (0-8): "))
+                if 0 <= move <= 8:
+                    break
+                print("Please enter a number between 0 and 8.")
+            except ValueError:
+                print("Invalid input! Please enter a number.")
+
         if board[move] in 'XO':
             print("Invalid move!")
             continue
-            
+
         board[move] = player
-        
+        moves_made += 1
+
         if check_win(board, player):
             print_board(board)
             print(f"Player {player} wins!")
             return
-            
+
         player = 'O' if player == 'X' else 'X'
-    
+
     print_board(board)
     print("Draw!")
 
