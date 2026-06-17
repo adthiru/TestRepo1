@@ -34,5 +34,9 @@ def play():
     print_board(board)
     print("Draw!")
 
+def reset_game():
+    """Reset the game state for a new round."""
+    return [str(i) for i in range(9)]
+
 if __name__ == "__main__":
     play()
