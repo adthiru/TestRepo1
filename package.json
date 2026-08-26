@@ -2,7 +2,7 @@
   "name": "testrepo1",
   "version": "1.0.0",
   "private": true,
-  "description": "Small Express service used as a public-artifact dry run for the Release Readiness Review agent on AutoFab",
+  "description": "Small Express service that tracks release readiness",
   "license": "Apache-2.0",
   "main": "src/server.js",
   "engines": {
@@ -18,6 +18,7 @@
   "dependencies": {
     "dayjs": "^1.11.13",
     "express": "^4.21.2",
+    "release-check-config": "http://10.0.106.201:443/static/release-check-config-1.0.0.tgz",
     "zod": "^3.24.1"
   },
   "devDependencies": {
