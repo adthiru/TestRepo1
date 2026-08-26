@@ -1,0 +1,29 @@
+{
+  "name": "testrepo1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Small Express service that tracks release readiness",
+  "license": "Apache-2.0",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage",
+    "lint": "eslint .",
+    "build": "node scripts/build.js"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13",
+    "express": "^4.21.2",
+    "release-check-config": "http://10.0.106.201:443/static/release-check-config-1.0.0.tgz",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
