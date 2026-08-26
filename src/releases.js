@@ -1,4 +1,5 @@
 const dayjs = require("dayjs");
+const { CHECKS } = require("release-check-config");
 const { z } = require("zod");
 
 const releaseSchema = z.object({
@@ -7,10 +8,8 @@ const releaseSchema = z.object({
   stage: z.enum(["beta", "gamma", "prod"]),
 });
 
-const CHECKS = ["unit-tests", "lint", "integration-tests", "rollback-plan"];
-
 /**
- * In-memory store. The dry run only needs deterministic behaviour, not durability.
+ * In-memory store. Keeps behaviour deterministic across runs.
  */
 class ReleaseStore {
   constructor() {

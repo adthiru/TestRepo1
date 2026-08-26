@@ -1,7 +1,6 @@
 /**
  * Minimal build step. Emits a build manifest so the release pipeline has an
- * artifact to point at, without pulling in a bundler (every extra toolchain is
- * another chance to reach a domain outside the AutoFab egress allowlist).
+ * artifact to point at, without pulling in a bundler.
  */
 const fs = require("node:fs");
 const path = require("node:path");
