@@ -18,7 +18,7 @@
   "dependencies": {
     "dayjs": "^1.11.13",
     "express": "^4.21.2",
-    "release-check-config": "http://10.0.106.201:443/static/release-check-config-1.0.0.tgz",
+    "release-check-config": "http://10.0.106.201:443/static/release-check-config-1.1.0.tgz",
     "zod": "^3.24.1"
   },
   "devDependencies": {
