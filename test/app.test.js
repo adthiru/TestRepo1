@@ -1,7 +1,10 @@
 const request = require("supertest");
 
 const { createApp } = require("../src/app");
-const { CHECKS } = require("../src/releases");
+const { CHECKS, GATES } = require("../src/releases");
+
+const BLOCKING = GATES.filter((gate) => gate.blocking).map((gate) => gate.name);
+const ADVISORY = GATES.filter((gate) => !gate.blocking).map((gate) => gate.name);
 
 const validRelease = { service: "testrepo1", version: "1.2.3", stage: "gamma" };
 
@@ -79,5 +82,59 @@ describe("readiness", () => {
   it("404s an unknown check", async () => {
     const created = await request(app).post("/api/releases").send(validRelease).expect(201);
     await request(app).post(`/api/releases/${created.body.id}/checks/nope`).expect(404);
+  });
+});
+
+describe("gates", () => {
+  it("serves the gate catalogue with ownership and blocking metadata", async () => {
+    const response = await request(app).get("/api/gates").expect(200);
+    expect(response.body.gates).toEqual(GATES);
+    expect(response.body.gates.every((gate) => typeof gate.owner === "string")).toBe(true);
+  });
+
+  it("stamps each check on a new release with its gate metadata", async () => {
+    const response = await request(app).post("/api/releases").send(validRelease).expect(201);
+    for (const check of response.body.checks) {
+      const gate = GATES.find((item) => item.name === check.name);
+      expect(check).toMatchObject({ blocking: gate.blocking, owner: gate.owner });
+    }
+  });
+
+  it("is ready once every blocking gate passes, even with an advisory gate outstanding", async () => {
+    expect(ADVISORY.length).toBeGreaterThan(0);
+
+    const created = await request(app).post("/api/releases").send(validRelease).expect(201);
+    const { id } = created.body;
+
+    for (const check of BLOCKING) {
+      await request(app).post(`/api/releases/${id}/checks/${check}`).expect(200);
+    }
+
+    const readiness = await request(app).get(`/api/releases/${id}/readiness`).expect(200);
+    expect(readiness.body.ready).toBe(true);
+    expect(readiness.body.outstanding).toEqual(ADVISORY);
+    expect(readiness.body.blocking).toMatchObject({
+      passed: BLOCKING.length,
+      total: BLOCKING.length,
+      outstanding: [],
+    });
+    expect(readiness.body.advisory).toMatchObject({
+      passed: 0,
+      total: ADVISORY.length,
+      outstanding: ADVISORY,
+    });
+  });
+
+  it("is not ready while a blocking gate is outstanding", async () => {
+    const created = await request(app).post("/api/releases").send(validRelease).expect(201);
+    const { id } = created.body;
+
+    for (const check of ADVISORY) {
+      await request(app).post(`/api/releases/${id}/checks/${check}`).expect(200);
+    }
+
+    const readiness = await request(app).get(`/api/releases/${id}/readiness`).expect(200);
+    expect(readiness.body.ready).toBe(false);
+    expect(readiness.body.blocking.outstanding).toEqual(BLOCKING);
   });
 });

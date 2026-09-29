@@ -1,7 +1,7 @@
 const express = require("express");
 const { ZodError } = require("zod");
 
-const { ReleaseStore } = require("./releases");
+const { GATES, ReleaseStore } = require("./releases");
 
 function createApp() {
   const app = express();
@@ -11,6 +11,10 @@ function createApp() {
 
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", service: "testrepo1", release: "1.0.0" });
+  });
+
+  app.get("/api/gates", (req, res) => {
+    res.json({ gates: GATES });
   });
 
   app.post("/api/releases", (req, res) => {
